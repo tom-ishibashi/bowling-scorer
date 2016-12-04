@@ -1,7 +1,8 @@
 package bowling.model;
 
 /**
- * Created by bassyMac on 2016/12/03.
+ * 倒したピンの数を保持するクラス
+ *
  */
 public class Pin {
     private int count;

@@ -3,7 +3,6 @@ package bowling.util;
 /**
  * バリデータークラス
  *
- * Created by bassyMac on 2016/12/04.
  */
 public class Validator {
 
@@ -33,5 +32,19 @@ public class Validator {
             return true;
        }
        return false;
+   }
+
+    /**
+     * パラメータの合計値が有効かをチェックします
+     *
+     * @param value1
+     * @param value2
+     * @return
+     */
+   public static boolean isValidSumValues(int value1, int value2) {
+        if (value1 + value2 > 10) {
+            return false;
+        }
+        return true;
    }
 }

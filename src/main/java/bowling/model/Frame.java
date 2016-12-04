@@ -3,11 +3,13 @@ package bowling.model;
 import java.util.List;
 
 /**
- * Created by bassyMac on 2016/12/03.
+ * フレームクラス
  */
 public class Frame {
     private int frame;
+
     private List<Pin> pins;
+
     private int score;
 
     public int getFrame() {

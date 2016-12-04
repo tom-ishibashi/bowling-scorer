@@ -11,7 +11,6 @@ import java.util.List;
 /**
  * 入力のサービスクラス
  *
- * Created by bassyMac on 2016/12/03.
  */
 public class InputPinService {
 
@@ -22,7 +21,7 @@ public class InputPinService {
      * @return
      * @throws IOException
      */
-    public Frame inputPin(int frameNo) throws IOException {
+    public Frame inputPinCount(int frameNo) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         List<Pin> pins = new ArrayList<Pin>();
