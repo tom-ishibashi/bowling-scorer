@@ -7,12 +7,19 @@ import bowling.util.Validator;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 入力のサービスクラス
  *
  */
 public class InputPinService {
+
+    private BufferedReader br;
+
+    public InputPinService() {
+        br = new BufferedReader(new InputStreamReader(System.in));
+    }
 
     /**
      * フレーム毎のピン数を入力します
@@ -23,14 +30,10 @@ public class InputPinService {
      */
     public Frame inputPinCount(int frameNo) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        List<Pin> pins = new ArrayList<Pin>();
+        List<Pin> pins = new ArrayList<>();
 
         int throwCount = 1;
         int maxThrowCount = 2;
-        if (frameNo == 10) {
-            maxThrowCount ++;
-        }
 
         try {
             System.out.println(frameNo + "フレーム");
@@ -38,9 +41,8 @@ public class InputPinService {
                 System.out.println(throwCount + "投目のピン数を入力してください");
                 String count = br.readLine();
 
-                if (validateInputValue(count)) {
-                    Pin pin = new Pin();
-                    pin.setCount(Integer.parseInt(count));
+                Pin pin = validateAndCreatePin(count);
+                if (pin != null) {
                     pins.add(pin);
                     throwCount++;
                 } else {
@@ -60,6 +62,41 @@ public class InputPinService {
         frame.setPins(pins);
         return frame;
     }
+
+    /**
+     * 10フレームの3投目向けピン数の入力
+     *
+     * @return
+     */
+    public void inputPinCount(Frame frame) throws IOException {
+
+        while (true) {
+            System.out.println("3投目のピン数を入力してください");
+            String count = br.readLine();
+            Pin pin = validateAndCreatePin(count);
+            if (pin != null) {
+                frame.getPins().add(pin);
+                break;
+            }
+        }
+    }
+
+    /**
+     * 入力値を元にPinオブジェクトを生成します。
+     *
+     * @param count
+     * @return
+     */
+    private Pin validateAndCreatePin(String count) {
+        Pin pin = new Pin();
+        if (validateInputValue(count)) {
+            pin.setCount(Integer.parseInt(count));
+        } else {
+            pin = null;
+        }
+        return pin;
+    }
+
 
     /**
      * 入力値のバリデーションを行います

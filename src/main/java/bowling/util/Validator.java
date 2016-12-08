@@ -16,6 +16,7 @@ public class Validator {
         try {
             Integer.parseInt(value);
         } catch (NumberFormatException nfe) {
+            System.out.println("1~10の数値を入力してください。");
             return false;
         }
         return true;
@@ -31,6 +32,7 @@ public class Validator {
        if (0 <= value && value <= 10) {
             return true;
        }
+       System.out.println("1~10の数値を入力してください。");
        return false;
    }
 
@@ -43,8 +45,9 @@ public class Validator {
      */
    public static boolean isValidSumValues(int value1, int value2) {
         if (value1 + value2 > 10) {
+            System.out.println("2投の合計は10以内になるように入力してください。");
             return false;
         }
-        return true;
+       return true;
    }
 }
