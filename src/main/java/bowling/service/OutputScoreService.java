@@ -40,7 +40,13 @@ public class OutputScoreService {
         StringBuilder frameNoRow = new StringBuilder();
         frames.forEach(frame -> {
             frameNoRow.append(PIPE);
-            frameNoRow.append(String.format("%3d",frame.getFrameNo()));
+
+            if (frame.getFrameNo() != 10) {
+                frameNoRow.append(String.format("%3d",frame.getFrameNo()));
+
+            } else {
+                frameNoRow.append(String.format("%5d",frame.getFrameNo()));
+            }
         });
         frameNoRow.append(PIPE);
         return frameNoRow;
@@ -64,9 +70,14 @@ public class OutputScoreService {
             pinRow.append(PIPE);
             pinRow.append(pin2);
 
-            if (frame.getFrameNo() == 10) {
+            if (frame.getFrameNo() == 10 && pins.size() == 3) {
                 int pin3 = pins.get(2).getCount();
+                pinRow.append(PIPE);
                 pinRow.append(pin3);
+
+            } else if (frame.getFrameNo() == 10 && pins.size() < 3) {
+                pinRow.append(PIPE);
+                pinRow.append(HALF_SPACE);
             }
         });
         pinRow.append(PIPE);
@@ -83,7 +94,13 @@ public class OutputScoreService {
         StringBuilder scoreRow = new StringBuilder();
         frames.forEach(frame -> {
             scoreRow.append(PIPE);
-            scoreRow.append(String.format("%3d", frame.getScore()));
+
+            if (frame.getFrameNo() != 10) {
+                scoreRow.append(String.format("%3d", frame.getScore()));
+
+            } else {
+                scoreRow.append(String.format("%5d", frame.getScore()));
+            }
         });
         scoreRow.append(PIPE);
         return scoreRow;

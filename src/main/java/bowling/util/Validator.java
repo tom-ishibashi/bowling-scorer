@@ -37,7 +37,7 @@ public class Validator {
    }
 
     /**
-     * パラメータの合計値が有効かをチェックします
+     * パラメータの合計値が有効かをチェック
      *
      * @param value1
      * @param value2

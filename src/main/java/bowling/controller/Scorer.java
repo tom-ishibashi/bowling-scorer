@@ -31,32 +31,27 @@ public class Scorer {
 
             // 1フレームから10フレームまでループ
             for (int i = 1; i <= 10; i++) {
-                Frame frame;
+                Frame frame = new Frame();
+                frame.setFrameNo(i);
+                System.out.println(i + "フレーム");
 
-                while (true) {
-                    frame = inputPinService.inputPinCount(i);
+                System.out.println("1投目のピン数を入力してください");
+                frame = inputPinService.inputPinCount(frame);
+                calculateService.calculateScore(frames, frame);
 
-                    // 2投の合計値をチェック
-                    if (!calculateService.validateSumCounts(frame.getPins())) {
-                        continue;
-                    }
-
-                    frames.add(frame);
-                    calculateService.calculateScore(frames);
-                    if (frame.getScore() > 0 ||
-                            (frame.getFirstPinCount() + frame.getSecondPinCount() == 10)) {
-                        break;
-                    } else {
-                        frames.remove(frames.size() - 1);
-                    }
-                }
+                System.out.println("2投目のピン数を入力してください");
+                frame = inputPinService.inputPinCount(frame);
+                calculateService.calculateScore(frames, frame);
 
                 // 10フレームの3投目
-                if (i == 10) {
-                    inputPinService.inputPinCount(frame);
-                    calculateService.calculateLastFrame(frames);
+                if (i == 10 && (frame.isStrike() || frame.isSpare())) {
+                    System.out.println("3投目のピン数を入力してください");
+                    frame = inputPinService.inputPinCount(frame);
+                    calculateService.calculateScore(frames, frame);
                 }
-                System.out.println("スコア = " + frames.get(frames.size() - 1).getScore());
+
+                frames.add(frame);
+                System.out.println("スコア = " + frame.getScore());
                 outputScoreService.outputScore(frames);
             }
 
@@ -65,6 +60,5 @@ public class Scorer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 }

@@ -7,6 +7,10 @@ package bowling.model;
 public class Pin {
     private int count;
 
+    public Pin() {
+        this.count = 0;
+    }
+
     public int getCount() {
         return count;
     }

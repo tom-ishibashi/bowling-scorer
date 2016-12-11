@@ -27,7 +27,7 @@ public class InputPinService {
      * @return
      * @throws IOException
      */
-    public Frame inputPinCount(int frameNo) throws IOException {
+    public Frame inputPinCount2(int frameNo) throws IOException {
 
         List<Pin> pins = new ArrayList<>();
 
@@ -63,22 +63,51 @@ public class InputPinService {
     }
 
     /**
+     * ピン数を入力し、パラメータのフレームに格納します
+     *
+     * @param frame
+     * @return
+     * @throws IOException
+     */
+    public Frame inputPinCount(Frame frame) throws IOException {
+
+        Pin pin;
+        while (true) {
+            String count = br.readLine();
+
+            pin = new Pin();
+            if (validateInputValue(count)) {
+                pin.setCount(Integer.parseInt(count));
+                frame.getPins().add(pin);
+
+                if (validateSumValues(frame.getPins())) {
+                    break;
+                } else {
+                    frame.getPins().remove(frame.getPins().size() - 1);
+                }
+            }
+        }
+        return frame;
+    }
+
+
+    /**
      * 10フレームの3投目向けピン数の入力
      *
      * @return
      */
-    public void inputPinCount(Frame frame) throws IOException {
-
-        while (true) {
-            System.out.println("3投目のピン数を入力してください");
-            String count = br.readLine();
-            Pin pin = validateAndCreatePin(count);
-            if (pin != null) {
-                frame.getPins().add(pin);
-                break;
-            }
-        }
-    }
+//    public void inputPinCount(Frame frame) throws IOException {
+//
+//        while (true) {
+//            System.out.println("3投目のピン数を入力してください");
+//            String count = br.readLine();
+//            Pin pin = validateAndCreatePin(count);
+//            if (pin != null) {
+//                frame.getPins().add(pin);
+//                break;
+//            }
+//        }
+//    }
 
     /**
      * 入力値を元にPinオブジェクトを生成します。
@@ -111,6 +140,19 @@ public class InputPinService {
 
         if (!Validator.isAvailableRange(Integer.parseInt(val))) {
             return false;
+        }
+        return true;
+    }
+
+    /**
+     * 2投の合計値のバリデーションを行います
+     * @param pins
+     * @return
+     */
+    private boolean validateSumValues(List<Pin> pins) {
+
+        if(pins.size() == 2) {
+            return Validator.isValidSumValues(pins.get(0).getCount(), pins.get(1).getCount());
         }
         return true;
     }

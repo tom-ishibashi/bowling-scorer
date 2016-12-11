@@ -1,5 +1,6 @@
 package bowling.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,6 +12,12 @@ public class Frame {
     private List<Pin> pins;
 
     private int score;
+
+    public Frame() {
+        this.frameNo = 0;
+        this.score = 0;
+        this.pins = new ArrayList<>();
+    }
 
     public int getFrameNo() {
         return frameNo;
@@ -68,4 +75,21 @@ public class Frame {
         return getPins().get(2).getCount();
     }
 
+    /**
+     * このフレームがストライクならtrueを返す
+     *
+     * @return
+     */
+    public boolean isStrike() {
+        return getFirstPinCount() == 10;
+    }
+
+    /**
+     * このフレームがスペアならtrueを返す
+     *
+     * @return
+     */
+    public boolean isSpare() {
+        return getFirstPinCount() + getSecondPinCount() == 10;
+    }
 }
