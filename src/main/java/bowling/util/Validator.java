@@ -16,7 +16,7 @@ public class Validator {
         try {
             Integer.parseInt(value);
         } catch (NumberFormatException nfe) {
-            System.out.println("1~10の数値を入力してください。");
+            System.out.println("0~10の数値を入力してください。");
             return false;
         }
         return true;
@@ -32,7 +32,7 @@ public class Validator {
        if (0 <= value && value <= 10) {
             return true;
        }
-       System.out.println("1~10の数値を入力してください。");
+       System.out.println("0~10の数値を入力してください。");
        return false;
    }
 

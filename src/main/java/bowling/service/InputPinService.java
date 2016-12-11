@@ -7,7 +7,6 @@ import bowling.util.Validator;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * 入力のサービスクラス
@@ -58,7 +57,7 @@ public class InputPinService {
         }
 
         Frame frame = new Frame();
-        frame.setFrame(frameNo);
+        frame.setFrameNo(frameNo);
         frame.setPins(pins);
         return frame;
     }

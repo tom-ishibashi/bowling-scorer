@@ -3,6 +3,7 @@ package bowling.controller;
 import bowling.model.Frame;
 import bowling.service.CalculateService;
 import bowling.service.InputPinService;
+import bowling.service.OutputScoreService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,10 +16,12 @@ public class Scorer {
 
     private InputPinService inputPinService;
     private CalculateService calculateService;
+    private OutputScoreService outputScoreService;
 
     public Scorer() {
         inputPinService = new InputPinService();
         calculateService = new CalculateService();
+        outputScoreService = new OutputScoreService();
     }
 
     public void execute() {
@@ -40,7 +43,8 @@ public class Scorer {
 
                     frames.add(frame);
                     calculateService.calculateScore(frames);
-                    if (frame.getScore() > 0) {
+                    if (frame.getScore() > 0 ||
+                            (frame.getFirstPinCount() + frame.getSecondPinCount() == 10)) {
                         break;
                     } else {
                         frames.remove(frames.size() - 1);
@@ -53,6 +57,7 @@ public class Scorer {
                     calculateService.calculateLastFrame(frames);
                 }
                 System.out.println("スコア = " + frames.get(frames.size() - 1).getScore());
+                outputScoreService.outputScore(frames);
             }
 
         } catch (IOException ie) {
