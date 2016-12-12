@@ -76,7 +76,7 @@ public class Frame {
     }
 
     /**
-     * このフレームがストライクならtrueを返す
+     * このフレームの1投目がストライクならtrueを返す
      *
      * @return
      */

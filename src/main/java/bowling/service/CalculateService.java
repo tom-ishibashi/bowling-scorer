@@ -11,6 +11,7 @@ import java.util.List;
 public class CalculateService {
 
     private static final int STRIKE = 10;
+    private static final int SPARE = 10;
     private static final int FIRST_THROW = 1;
     private static final int SECOND_THROW = 2;
     private static final int THIRD_THROW = 3;
@@ -30,16 +31,18 @@ public class CalculateService {
         calculateStrike(frames, currentFrame);
 
         // スペアの計算
-        // TODO のちほど実装する
+        calculateSpare(frames, currentFrame);
 
         // 2投目を入力してない場合はスキップする
         if (currentFrame.getPins().size() != 2) {
             return;
         }
 
-        // ストライクではない場合、または10フレームの3投目ではない場合1つ前のフレームのスコアに合計する
-        if (!currentFrame.isStrike() ||
+        // ストライクではないかつスペアではない場合、または10フレームの3投目ではない場合1つ前のフレームのスコアに合計する
+        if (!currentFrame.isStrike() &&
+                !currentFrame.isSpare() &&
                 (currentFrame.getFrameNo() == 10 && currentFrame.getPins().size() != 3)) {
+
             int score = sumPinCount(currentFrame.getPins());
 
             // 1つ前のフレームが無い場合最新スコアは0とする
@@ -172,5 +175,58 @@ public class CalculateService {
         count += pins.get(0).getCount();
         count += pins.get(1).getCount();
         return count;
+    }
+
+    /**
+     * スペアの計算を行います
+     *
+     * @param frames
+     * @param currentFrame
+     */
+    private void calculateSpare(List<Frame> frames, Frame currentFrame) {
+
+        int lastFrameIndex = frames.size() - 1;
+
+        if (currentFrame.getFrameNo() == 10 && currentFrame.getPins().size() == 3) {
+            calculateSpare10Frame(frames, currentFrame);
+            return;
+        }
+
+        // 現在フレームの2投目以降の場合はスキップ
+        if (currentFrame.getPins().size() > 1) {
+            return;
+        }
+
+        // 1つ前のフレームが無い場合スキップ
+        if (lastFrameIndex < 0) {
+            return;
+        }
+
+        Frame lastFrame = frames.get(lastFrameIndex);
+        if (lastFrame.isSpare()) {
+
+            int lastScore = 0;
+            if (lastFrameIndex - 1 >= 0) {
+                lastScore = frames.get(lastFrameIndex - 1).getScore();
+            }
+            lastFrame.setScore(lastScore + SPARE + currentFrame.getFirstPinCount());
+        }
+    }
+
+    /**
+     * 10フレーム目のスペアを計算します。
+     *
+     * @param frames
+     * @param currentFrame
+     */
+    private void calculateSpare10Frame(List<Frame> frames, Frame currentFrame) {
+
+        int lastFrameIndex = frames.size() - 1;
+
+        if (currentFrame.isSpare()) {
+            Frame lastFrame = frames.get(lastFrameIndex);
+            int lastScore = lastFrame.getScore();
+            currentFrame.setScore(lastScore + SPARE + currentFrame.getThirdPinCount());
+        }
     }
 }
