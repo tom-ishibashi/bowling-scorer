@@ -2,7 +2,6 @@ package bowling.service;
 
 import bowling.model.Frame;
 import bowling.model.Pin;
-import bowling.util.Validator;
 
 import java.util.List;
 
@@ -40,7 +39,7 @@ public class CalculateService {
 
         // ストライクではない場合、または10フレームの3投目ではない場合1つ前のフレームのスコアに合計する
         if (!currentFrame.isStrike() ||
-                currentFrame.getFrameNo() == 10 && currentFrame.getPins().size() != 3) {
+                (currentFrame.getFrameNo() == 10 && currentFrame.getPins().size() != 3)) {
             int score = sumPinCount(currentFrame.getPins());
 
             // 1つ前のフレームが無い場合最新スコアは0とする
@@ -126,6 +125,11 @@ public class CalculateService {
 
         int lastFrameIndex = frames.size() - 1;
 
+        // 9フレームまでで、1投目がストライクの時はスキップ
+        if (currentFrame.getFrameNo() != 10 && currentFrame.isStrike()) {
+            return;
+        }
+
         Frame lastFrame = frames.get(lastFrameIndex);
         if (lastFrame.isStrike() &&
                 lastFrame.getScore() == 0) {
@@ -152,20 +156,9 @@ public class CalculateService {
 
         if (currentFrame.isStrike()) {
             int lastScore = frames.get(lastFrameIndex).getScore();
+
             currentFrame.setScore(lastScore + STRIKE + currentFrame.getSecondPinCount() + currentFrame.getThirdPinCount());
         }
-    }
-
-    /**
-     * ピン数のチェック
-     *
-     * @param pins
-     * @return
-     */
-    public boolean validateSumCounts(List<Pin> pins) {
-
-        return Validator
-                .isValidSumValues(pins.get(0).getCount(), pins.get(1).getCount());
     }
 
     /**

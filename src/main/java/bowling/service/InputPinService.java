@@ -21,48 +21,6 @@ public class InputPinService {
     }
 
     /**
-     * フレーム毎のピン数を入力します
-     *
-     * @param frameNo
-     * @return
-     * @throws IOException
-     */
-    public Frame inputPinCount2(int frameNo) throws IOException {
-
-        List<Pin> pins = new ArrayList<>();
-
-        int throwCount = 1;
-        int maxThrowCount = 2;
-
-        try {
-            System.out.println(frameNo + "フレーム");
-            while (true) {
-                System.out.println(throwCount + "投目のピン数を入力してください");
-                String count = br.readLine();
-
-                Pin pin = validateAndCreatePin(count);
-                if (pin != null) {
-                    pins.add(pin);
-                    throwCount++;
-                } else {
-                    continue;
-                }
-
-                if (throwCount > maxThrowCount) {
-                    break;
-                }
-            }
-        } catch(IOException ie) {
-            throw ie;
-        }
-
-        Frame frame = new Frame();
-        frame.setFrameNo(frameNo);
-        frame.setPins(pins);
-        return frame;
-    }
-
-    /**
      * ピン数を入力し、パラメータのフレームに格納します
      *
      * @param frame
@@ -80,6 +38,13 @@ public class InputPinService {
                 pin.setCount(Integer.parseInt(count));
                 frame.getPins().add(pin);
 
+                // 10フレーム目で1投目がストライク、または2投目でスペアの場合、合計値チェックをスキップ
+                if(frame.getFrameNo() == 10 &&
+                        (frame.isStrike() ||
+                        (frame.getPins().size() == 2 && frame.isSpare()))) {
+                    break;
+                }
+
                 if (validateSumValues(frame.getPins())) {
                     break;
                 } else {
@@ -89,25 +54,6 @@ public class InputPinService {
         }
         return frame;
     }
-
-
-    /**
-     * 10フレームの3投目向けピン数の入力
-     *
-     * @return
-     */
-//    public void inputPinCount(Frame frame) throws IOException {
-//
-//        while (true) {
-//            System.out.println("3投目のピン数を入力してください");
-//            String count = br.readLine();
-//            Pin pin = validateAndCreatePin(count);
-//            if (pin != null) {
-//                frame.getPins().add(pin);
-//                break;
-//            }
-//        }
-//    }
 
     /**
      * 入力値を元にPinオブジェクトを生成します。
@@ -124,7 +70,6 @@ public class InputPinService {
         }
         return pin;
     }
-
 
     /**
      * 入力値のバリデーションを行います
