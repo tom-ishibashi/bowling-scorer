@@ -1,11 +1,11 @@
-package bowling.service;
+package bowling.presentation;
 
 import bowling.model.Frame;
 import bowling.model.Pin;
 
 import java.util.List;
 
-public class OutputScoreService {
+public class OutputData {
 
     private static final String PIPE = "|";
     private static final String STRIKE = "X";

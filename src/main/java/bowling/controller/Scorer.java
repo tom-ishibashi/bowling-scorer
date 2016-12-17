@@ -2,8 +2,8 @@ package bowling.controller;
 
 import bowling.model.Frame;
 import bowling.service.CalculateService;
-import bowling.service.InputPinService;
-import bowling.service.OutputScoreService;
+import bowling.presentation.InputData;
+import bowling.presentation.OutputData;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,14 +14,14 @@ import java.util.List;
  */
 public class Scorer {
 
-    private InputPinService inputPinService;
+    private InputData inputData;
     private CalculateService calculateService;
-    private OutputScoreService outputScoreService;
+    private OutputData outputData;
 
     public Scorer() {
-        inputPinService = new InputPinService();
+        inputData = new InputData();
         calculateService = new CalculateService();
-        outputScoreService = new OutputScoreService();
+        outputData = new OutputData();
     }
 
     public void execute() {
@@ -36,23 +36,23 @@ public class Scorer {
                 System.out.println(i + "フレーム");
 
                 System.out.println("1投目のピン数を入力してください");
-                frame = inputPinService.inputPinCount(frame);
+                frame = inputData.inputPinCount(frame);
                 calculateService.calculateScore(frames, frame);
 
                 System.out.println("2投目のピン数を入力してください");
-                frame = inputPinService.inputPinCount(frame);
+                frame = inputData.inputPinCount(frame);
                 calculateService.calculateScore(frames, frame);
 
                 // 10フレームの3投目
                 if (i == 10 && (frame.isStrike() || frame.isSpare())) {
                     System.out.println("3投目のピン数を入力してください");
-                    frame = inputPinService.inputPinCount(frame);
+                    frame = inputData.inputPinCount(frame);
                     calculateService.calculateScore(frames, frame);
                 }
 
                 frames.add(frame);
                 System.out.println("スコア = " + frame.getScore());
-                outputScoreService.outputScore(frames);
+                outputData.outputScore(frames);
             }
 
         } catch (IOException ie) {

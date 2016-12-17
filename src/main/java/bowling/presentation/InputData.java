@@ -1,4 +1,4 @@
-package bowling.service;
+package bowling.presentation;
 
 import bowling.model.Frame;
 import bowling.model.Pin;
@@ -12,11 +12,11 @@ import java.util.List;
  * 入力のサービスクラス
  *
  */
-public class InputPinService {
+public class InputData {
 
     private BufferedReader br;
 
-    public InputPinService() {
+    public InputData() {
         br = new BufferedReader(new InputStreamReader(System.in));
     }
 
