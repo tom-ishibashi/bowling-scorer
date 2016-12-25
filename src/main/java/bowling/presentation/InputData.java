@@ -4,8 +4,9 @@ import bowling.model.Frame;
 import bowling.model.Pin;
 import bowling.util.Validator;
 
-import java.io.*;
-import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 
 /**

@@ -14,10 +14,10 @@ create table frame(
 create table pin (
   frame_id    integer(10),
   frame_no    integer(10),
-  throw       integer(10),
+  throwing    integer(10),
   count       integer(10),
   entry_date  datetime,
   upd_date    datetime,
   version     integer,
-  PRIMARY KEY(frame_id, frame_no, throw)
+  PRIMARY KEY(frame_id, frame_no, throwing)
 );

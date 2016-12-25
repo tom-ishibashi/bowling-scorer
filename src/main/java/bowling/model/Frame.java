@@ -7,6 +7,9 @@ import java.util.List;
  * フレームクラス
  */
 public class Frame {
+
+    private int id;
+
     private int frameNo;
 
     private List<Pin> pins;
@@ -43,6 +46,13 @@ public class Frame {
         this.score = score;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     /**
      * フレームの1投目のピン数を取得します。
@@ -90,6 +100,6 @@ public class Frame {
      * @return
      */
     public boolean isSpare() {
-        return getFirstPinCount() + getSecondPinCount() == 10;
+        return !isStrike() && getFirstPinCount() + getSecondPinCount() == 10;
     }
 }
