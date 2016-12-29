@@ -30,7 +30,7 @@ public class FrameDao extends BaseDao {
     /**
      * IDを採番します
      *
-     * @return
+     * @return 最新id
      */
     public int getNewId() throws SQLException {
 
@@ -46,8 +46,8 @@ public class FrameDao extends BaseDao {
     /**
      * フレームを保存します
      *
-     * @param frame
-     * @throws SQLException
+     * @param frame フレーム
+     * @throws SQLException SQL例外
      */
     public void save(Frame frame) throws SQLException {
         setSaveParams(frame);
@@ -65,8 +65,8 @@ public class FrameDao extends BaseDao {
     /**
      * フレームを更新します
      *
-     * @param frame
-     * @throws SQLException
+     * @param frame フレーム
+     * @throws SQLException SQL例外
      */
     public void update(Frame frame) throws SQLException {
         setUpdateParams(frame);
@@ -81,9 +81,10 @@ public class FrameDao extends BaseDao {
 
     /**
      * モデルからエンティティへ詰め替えを行います
+     * TODO ユーティリティに切り出してもいいかも。
      *
-     * @param model
-     * @return
+     * @param model モデル
+     * @return エンティティ
      */
     public Frame convertToEntity(bowling.model.Frame model) {
         Frame entity = new Frame();
@@ -91,20 +92,6 @@ public class FrameDao extends BaseDao {
         entity.setFrameNo(model.getFrameNo());
         entity.setScore(model.getScore());
         return entity;
-    }
-
-
-    /**
-     * エンティティからモデルへ詰め替えを行います
-     *
-     * @param entity
-     * @return
-     */
-    public bowling.model.Frame convertToModel(Frame entity) {
-        bowling.model.Frame model = new bowling.model.Frame();
-        model.setFrameNo(entity.getFrameNo());
-        model.setScore(entity.getScore());
-        return model;
     }
 
     private PreparedStatement getInsert() {

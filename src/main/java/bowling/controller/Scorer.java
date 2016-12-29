@@ -3,7 +3,7 @@ package bowling.controller;
 import bowling.model.Frame;
 import bowling.presentation.InputData;
 import bowling.presentation.OutputData;
-import bowling.service.CalculationService;
+import bowling.service.Calculation;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,12 +15,12 @@ import java.util.List;
 public class Scorer {
 
     private InputData inputData;
-    private CalculationService calculationService;
+    private Calculation calculation;
     private OutputData outputData;
 
     public Scorer() {
         this.inputData = new InputData();
-        this.calculationService = new CalculationService();
+        this.calculation = new Calculation();
         this.outputData = new OutputData();
     }
 
@@ -36,24 +36,25 @@ public class Scorer {
             for (int i = 1; i <= 10; i++) {
                 Frame frame = new Frame();
                 frame.setFrameNo(i);
+                frames.add(frame);
+
                 System.out.println(i + "フレーム");
 
                 System.out.println("1投目のピン数を入力してください");
-                frame = inputData.inputPinCount(frame);
-                calculationService.calculateScore(frames, frame);
+                inputData.input(frames);
+                calculation.calculateScore(frames);
 
                 System.out.println("2投目のピン数を入力してください");
-                frame = inputData.inputPinCount(frame);
-                calculationService.calculateScore(frames, frame);
+                inputData.input(frames);
+                calculation.calculateScore(frames);
 
                 // 10フレームの3投目
                 if (i == 10 && (frame.isStrike() || frame.isSpare())) {
                     System.out.println("3投目のピン数を入力してください");
-                    frame = inputData.inputPinCount(frame);
-                    calculationService.calculateScore(frames, frame);
+                    inputData.input(frames);
+                    calculation.calculateScore(frames);
                 }
 
-                frames.add(frame);
                 outputData.outputScore(frames);
             }
 

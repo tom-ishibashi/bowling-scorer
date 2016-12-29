@@ -27,8 +27,8 @@ public class PinDao extends BaseDao {
     /**
      * ピンを保存します
      *
-     * @param pin
-     * @throws SQLException
+     * @param pin エンティティ
+     * @throws SQLException SQL例外
      */
     public void save(Pin pin) throws SQLException {
         setSaveParams(pin);
@@ -46,10 +46,11 @@ public class PinDao extends BaseDao {
 
     /**
      * モデルからエンティティへ詰め替えを行います
+     * TODO ユーティリティに切り出してもいいかも。
      *
-     * @param frame
-     * @param throwing
-     * @return
+     * @param frame フレーム
+     * @param throwing 投数
+     * @return エンティティ
      */
     public Pin convertToEntity(Frame frame, int throwing) {
         Pin entity = new Pin();
@@ -62,7 +63,7 @@ public class PinDao extends BaseDao {
         return entity;
     }
 
-    public PreparedStatement getInsert() {
+    private PreparedStatement getInsert() {
         return insert;
     }
 }

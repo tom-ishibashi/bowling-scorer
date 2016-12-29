@@ -22,13 +22,16 @@ public class InputData {
     }
 
     /**
-     * ピン数を入力し、パラメータのフレームに格納します
+     * ピン数を入力し、最新のフレームに格納します
      *
-     * @param frame
+     * @param frames
      * @return
      * @throws IOException
      */
-    public Frame inputPinCount(Frame frame) throws IOException {
+    public void input(List<Frame> frames) throws IOException {
+
+        // 最新フレームを取得
+        Frame frame = frames.get(frames.size() - 1);
 
         Pin pin;
         while (true) {
@@ -42,7 +45,7 @@ public class InputData {
                 // 10フレーム目で1投目がストライク、または2投目でスペアの場合、合計値チェックをスキップ
                 if(frame.getFrameNo() == 10 &&
                         (frame.isStrike() ||
-                        (frame.getPins().size() == 2 && frame.isSpare()))) {
+                                (frame.getPins().size() == 2 && frame.isSpare()))) {
                     break;
                 }
 
@@ -53,23 +56,6 @@ public class InputData {
                 }
             }
         }
-        return frame;
-    }
-
-    /**
-     * 入力値を元にPinオブジェクトを生成します。
-     *
-     * @param count
-     * @return
-     */
-    private Pin validateAndCreatePin(String count) {
-        Pin pin = new Pin();
-        if (validateInputValue(count)) {
-            pin.setCount(Integer.parseInt(count));
-        } else {
-            pin = null;
-        }
-        return pin;
     }
 
     /**
