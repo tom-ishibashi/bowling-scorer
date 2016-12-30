@@ -1,7 +1,6 @@
 package bowling.presentation;
 
 import bowling.model.Frame;
-import bowling.model.Pin;
 
 import java.util.List;
 
@@ -25,9 +24,9 @@ public class OutputData {
         String pinRow = createPinRow(frames);
         String scoreRow = createScoreRow(frames);
 
-        System.out.println(frameNoRow.toString());
-        System.out.println(pinRow.toString());
-        System.out.println(scoreRow.toString());
+        System.out.println(frameNoRow);
+        System.out.println(pinRow);
+        System.out.println(scoreRow);
     }
 
     /**
@@ -63,19 +62,18 @@ public class OutputData {
         frames.forEach(frame -> {
             pinRow.append(PIPE);
 
-            List<Pin> pins = frame.getPins();
-            int pin1 = pins.get(0).getCount();
-            int pin2 = pins.get(1).getCount();
-            pinRow.append(pin1);
+            int firstThrow = frame.getFirstPinCount();
+            int secondThrow = frame.getSecondPinCount();
+            pinRow.append(firstThrow);
             pinRow.append(PIPE);
-            pinRow.append(pin2);
+            pinRow.append(secondThrow);
 
-            if (frame.getFrameNo() == 10 && pins.size() == 3) {
-                int pin3 = pins.get(2).getCount();
+            if (frame.getFrameNo() == 10 && frame.getThrownCount() == 3) {
+                int thirdThrow = frame.getThirdPinCount();
                 pinRow.append(PIPE);
-                pinRow.append(pin3);
+                pinRow.append(thirdThrow);
 
-            } else if (frame.getFrameNo() == 10 && pins.size() < 3) {
+            } else if (frame.getFrameNo() == 10 && frame.getThrownCount() < 3) {
                 pinRow.append(PIPE);
                 pinRow.append(HALF_SPACE);
             }
