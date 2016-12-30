@@ -8,25 +8,23 @@ import bowling.model.Pin;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * スコア計算のクラス
  */
-public class Calculation {
+public class ScoreCalculator {
 
     private static final int STRIKE = 10;
     private static final int SPARE = 10;
-    private static final int FIRST_THROW = 1;
-    private static final int SECOND_THROW = 2;
-    private static final int THIRD_THROW = 3;
 
     private FrameDao frameDao;
     private PinDao pinDao;
 
     private int frameId = 0;
 
-    public Calculation() {
+    public ScoreCalculator() {
 
         try {
             Connection con = BaseDao.getConnection();
@@ -43,7 +41,7 @@ public class Calculation {
      *
      * @param frames 前フレームまでのフレームリスト
      */
-    public void calculateScore(List<Frame> frames) throws SQLException {
+    public void calculate(List<Frame> frames) throws SQLException {
 
         Frame currentFrame = getFrame(frames, Cursor.LAST);
 
@@ -59,13 +57,11 @@ public class Calculation {
         // スペアの計算
         calculateSpare(frames);
 
-        // 2投目を入力してない場合はスキップする
-        if (currentFrame.getPins().size() != 2) {
-            return;
-        }
-
         // ストライクとスペア以外の計算
         calculateNormal(frames);
+
+        // 計算結果保存
+        save(frames);
     }
 
 
@@ -83,8 +79,10 @@ public class Calculation {
         // 最新のフレーム取得
         Frame currentFrame = getFrame(frames, Cursor.LAST);
 
-        // ストライクではないかつスペアではない場合
-        if (!currentFrame.isStrike() && !currentFrame.isSpare()) {
+        // ストライクではないかつスペアではない、2回以上投げている場合
+        if (!currentFrame.isStrike() &&
+                !currentFrame.isSpare() &&
+                1 < currentFrame.getThrownCount()) {
 
             int score = sumPinCount(currentFrame);
 
@@ -98,8 +96,6 @@ public class Calculation {
             // 現在のフレームのスコア
             currentFrame.setScore(lastScore + score);
         }
-
-        save(currentFrame);
     }
 
     /**
@@ -132,19 +128,19 @@ public class Calculation {
             return;
         }
 
-        // ストライクの計算
-        switch (getFrame(frames, Cursor.LAST).getPins().size()) {
-            case FIRST_THROW:
+        // 投球に合わせてストライクを計算
+        switch (Throwing.getThrowing(getFrame(frames, Cursor.LAST).getThrownCount())) {
+            case FIRST:
                 updatedFrameNo = calcStrikeFirstThrow(frames);
                 break;
-            case SECOND_THROW:
+            case SECOND:
                 updatedFrameNo = calcStrikeSecondThrow(frames);
                 break;
-            case THIRD_THROW:
+            case THIRD:
                 updatedFrameNo = calcStrikeThirdThrow(frames);
                 break;
             default:
-                break;
+                throw new IllegalArgumentException("Throwing count is invalid");
         }
 
         // ストライクフレームの更新
@@ -214,15 +210,14 @@ public class Calculation {
     }
 
     /**
-     * 現在フレームの3投目を基準にストライクの計算を行います
-     * このメソッドは10フレーム目の場合に使用される想定です
+     * 現在フレームの3投目を基準にストライクの計算を行います。
+     * このメソッドは10フレーム目の場合に使用される想定です。
+     * 10フレームの更新は不要なため戻り値は必ず0を返します。
      *
      * @param frames フレームのリスト
      * @return 更新対象のフレームNo
      */
     private int calcStrikeThirdThrow(List<Frame> frames) throws SQLException {
-
-        int updateTarget = 0;
 
         Frame currentFrame = getFrame(frames, Cursor.LAST);
 
@@ -230,9 +225,8 @@ public class Calculation {
             int lastScore = getFrame(frames, Cursor.SECOND_LAST).getScore();
 
             currentFrame.setScore(lastScore + STRIKE + currentFrame.getSecondPinCount() + currentFrame.getThirdPinCount());
-            updateTarget = currentFrame.getFrameNo();
         }
-        return updateTarget;
+        return 0;
     }
 
     /**
@@ -263,7 +257,7 @@ public class Calculation {
         Frame currentFrame = getFrame(frames, Cursor.LAST);
 
         // 10フレームの3投目の場合
-        if (currentFrame.getFrameNo() == 10 && currentFrame.getPins().size() == 3) {
+        if (currentFrame.getFrameNo() == 10 && currentFrame.getThrownCount() == 3) {
             updatedFrameNo = calculateSpare10Frame(frames);
 
             Frame spareFrame = getUpdateTargetFrame(updatedFrameNo, frames);
@@ -272,7 +266,7 @@ public class Calculation {
         }
 
         // 現在フレームの2投目以降の場合はスキップ
-        if (currentFrame.getPins().size() > 1) {
+        if (currentFrame.getThrownCount() > 1) {
             return;
         }
 
@@ -300,13 +294,13 @@ public class Calculation {
 
     /**
      * 10フレーム目のスペアを計算します
+     * このメソッドは10フレーム目の場合に使用される想定です
+     * 10フレームの更新は不要なため戻り値は必ず0を返します。
      *
      * @param frames フレームのリスト
      * @return 更新対象のフレームNo
      */
     private int calculateSpare10Frame(List<Frame> frames) throws SQLException {
-
-        int updateTarget = 0;
 
         Frame currentFrame = getFrame(frames, Cursor.LAST);
 
@@ -314,9 +308,44 @@ public class Calculation {
             Frame secondLastFrame = getFrame(frames, Cursor.SECOND_LAST);
             int lastScore = secondLastFrame.getScore();
             currentFrame.setScore(lastScore + SPARE + currentFrame.getThirdPinCount());
-            updateTarget = currentFrame.getFrameNo();
         }
-        return updateTarget;
+        return 0;
+    }
+
+    /**
+     * 計算結果を保存します
+     *
+     * @param frames フレームのリスト
+     */
+    private void save(List<Frame> frames) throws SQLException {
+
+        Frame currentFrame = getFrame(frames, Cursor.LAST);
+
+        // 1~9フレームの場合
+        if (currentFrame.getFrameNo() < 10) {
+
+            // 2回投げてない場合スキップ
+            if (currentFrame.getThrownCount() < 2) {
+                return;
+            }
+
+        // 10フレームの場合
+        } else {
+
+            // ストライクではない、かつ2回投げてない場合スキップ
+            if (!currentFrame.isStrike() && currentFrame.getThrownCount() < 2) {
+                return;
+            }
+
+            // ストライクまたはスペア、かつ3回投げてない場合スキップ
+            if ((currentFrame.isStrike() || currentFrame.isSpare()) &&
+                    currentFrame.getThrownCount() < 3) {
+                return;
+            }
+        }
+
+        saveFrame(currentFrame);
+        savePin(currentFrame);
     }
 
     /**
@@ -324,11 +353,18 @@ public class Calculation {
      *
      * @param frame フレーム
      */
-    private void save(Frame frame) throws SQLException {
+    private void saveFrame(Frame frame) throws SQLException {
 
         getFrameDao().save(getFrameDao().convertToEntity(frame));
+    }
 
-        // TODO 10フレームの3投目が保存されない
+    /**
+     * ピンを保存します
+     *
+     * @param frame フレーム
+     */
+    private void savePin(Frame frame) throws SQLException {
+
         for (int i = 1; i <= frame.getPins().size(); i++) {
             bowling.Entity.Pin pinEntity = getPinDao().convertToEntity(frame, i);
             getPinDao().save(pinEntity);
@@ -371,7 +407,7 @@ public class Calculation {
                 frame = frames.get(frames.size() - Cursor.FOURTH_LAST.getRelativeNo());
                 break;
             default:
-                throw new IllegalArgumentException("Cursor invalid");
+                throw new IllegalArgumentException("Cursor is invalid");
         }
         return frame;
     }
@@ -414,6 +450,29 @@ public class Calculation {
 
         public int getRelativeNo() {
             return relativeNo;
+        }
+    }
+
+    private enum Throwing {
+        FIRST(1),
+        SECOND(2),
+        THIRD(3);
+
+        private int count;
+
+        Throwing(int count) {
+            this.count = count;
+        }
+
+        public int getCount() {
+            return count;
+        }
+
+        public static Throwing getThrowing(int count) {
+            return Arrays.stream(Throwing.values())
+                    .filter(t -> t.getCount() == count)
+                    .findFirst()
+                    .get();
         }
     }
 

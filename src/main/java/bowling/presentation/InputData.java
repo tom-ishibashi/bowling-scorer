@@ -45,14 +45,14 @@ public class InputData {
                 // 10フレーム目で1投目がストライク、または2投目でスペアの場合、合計値チェックをスキップ
                 if(frame.getFrameNo() == 10 &&
                         (frame.isStrike() ||
-                                (frame.getPins().size() == 2 && frame.isSpare()))) {
+                                (frame.getThrownCount() == 2 && frame.isSpare()))) {
                     break;
                 }
 
                 if (validateSumValues(frame.getPins())) {
                     break;
                 } else {
-                    frame.getPins().remove(frame.getPins().size() - 1);
+                    frame.getPins().remove(frame.getThrownCount() - 1);
                 }
             }
         }

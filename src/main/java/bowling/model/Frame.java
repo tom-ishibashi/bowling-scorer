@@ -57,18 +57,29 @@ public class Frame {
     /**
      * フレームの1投目のピン数を取得します。
      *
-     * @return
+     * @return 1投目のピン数
      */
     public int getFirstPinCount() {
+
+        // 1投目がまだの場合0を返します。
+        if (getPins().size() == 0) {
+            return 0;
+        }
         return getPins().get(0).getCount();
     }
 
     /**
      * フレームの2投目のピン数を取得します。
      *
-     * @return
+     * @return 2投目のピン数
      */
     public int getSecondPinCount() {
+
+        // 2投目がまだの場合0を返します。
+        if (getPins().size() == 1) {
+            return 0;
+        }
+
         return getPins().get(1).getCount();
     }
 
@@ -76,19 +87,25 @@ public class Frame {
      * フレームの3投目のピン数を取得します。
      * 10フレーム目ではない場合0を返します。
      *
-     * @return
+     * @return 3投目のピン数
      */
     public int getThirdPinCount() {
         if (getFrameNo() != 10) {
             return 0;
         }
+
+        // 3投目がまだの場合0を返します。
+        if (getPins().size() == 2) {
+            return 0;
+        }
+
         return getPins().get(2).getCount();
     }
 
     /**
      * このフレームの1投目がストライクならtrueを返す
      *
-     * @return
+     * @return ストライクならtrue
      */
     public boolean isStrike() {
         return getFirstPinCount() == 10;
@@ -97,9 +114,18 @@ public class Frame {
     /**
      * このフレームがスペアならtrueを返す
      *
-     * @return
+     * @return スペアならtrue
      */
     public boolean isSpare() {
         return !isStrike() && getFirstPinCount() + getSecondPinCount() == 10;
+    }
+
+    /**
+     * 投球回数を返す
+     *
+     * @return 回数
+     */
+    public int getThrownCount() {
+        return getPins().size();
     }
 }
