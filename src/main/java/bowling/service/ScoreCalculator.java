@@ -122,12 +122,6 @@ public class ScoreCalculator {
 
         int updatedFrameNo = 0;
 
-        // 2つ前までのフレームが無い場合スキップ
-        if (getFrameIndex(frames, Cursor.THIRD_LAST) < 0 ||
-                getFrameIndex(frames, Cursor.SECOND_LAST) < 0) {
-            return;
-        }
-
         // 投球に合わせてストライクを計算
         switch (Throwing.getThrowing(getFrame(frames, Cursor.LAST).getThrownCount())) {
             case FIRST:
@@ -158,6 +152,12 @@ public class ScoreCalculator {
 
         int updateTarget = 0;
 
+        // 2つ前までのフレームが無い場合スキップ
+        if (getFrameIndex(frames, Cursor.THIRD_LAST) < 0 ||
+                getFrameIndex(frames, Cursor.SECOND_LAST) < 0) {
+            return updateTarget;
+        }
+
         Frame currentFrame = getFrame(frames, Cursor.LAST);
         Frame secondLastFrame = getFrame(frames, Cursor.SECOND_LAST);
         Frame thirdLastFrame = getFrame(frames, Cursor.THIRD_LAST);
@@ -186,6 +186,11 @@ public class ScoreCalculator {
     private int calcStrikeSecondThrow(List<Frame> frames) throws SQLException {
 
         int updateTarget = 0;
+
+        // 1つ前のフレームが無い場合スキップ
+        if (getFrameIndex(frames, Cursor.SECOND_LAST) < 0) {
+            return updateTarget;
+        }
 
         Frame currentFrame = getFrame(frames, Cursor.LAST);
         Frame secondLastFrame = getFrame(frames, Cursor.SECOND_LAST);
@@ -324,8 +329,8 @@ public class ScoreCalculator {
         // 1~9フレームの場合
         if (currentFrame.getFrameNo() < 10) {
 
-            // 2回投げてない場合スキップ
-            if (currentFrame.getThrownCount() < 2) {
+            // ストライクでない、かつ2回投げてない場合スキップ
+            if (!currentFrame.isStrike() && currentFrame.getThrownCount() < 2) {
                 return;
             }
 

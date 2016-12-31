@@ -34,9 +34,9 @@ public class Scorer {
 
             // 1フレームから10フレームまでループ
             for (int i = 1; i <= 10; i++) {
-                Frame frame = new Frame();
-                frame.setFrameNo(i);
-                frames.add(frame);
+                Frame currentFrame = new Frame();
+                currentFrame.setFrameNo(i);
+                frames.add(currentFrame);
 
                 System.out.println(i + "フレーム");
 
@@ -44,17 +44,28 @@ public class Scorer {
                 inputData.input(frames);
                 scoreCalculator.calculate(frames);
 
-                System.out.println("2投目のピン数を入力してください");
-                inputData.input(frames);
-                scoreCalculator.calculate(frames);
+                // 1~9フレームの場合
+                if (i < 10) {
+                    if (!currentFrame.isStrike()) {
+                        System.out.println("2投目のピン数を入力してください");
+                        inputData.input(frames);
+                        scoreCalculator.calculate(frames);
+                    }
 
-                // 10フレームの3投目
-                if (i == 10 && (frame.isStrike() || frame.isSpare())) {
-                    System.out.println("3投目のピン数を入力してください");
+                // 10フレームの場合
+                } else {
+
+                    System.out.println("2投目のピン数を入力してください");
                     inputData.input(frames);
                     scoreCalculator.calculate(frames);
-                }
 
+                    // 10フレームの3投目
+                    if (currentFrame.isStrike() || currentFrame.isSpare()) {
+                        System.out.println("3投目のピン数を入力してください");
+                        inputData.input(frames);
+                        scoreCalculator.calculate(frames);
+                    }
+                }
                 outputData.outputScore(frames);
             }
 
