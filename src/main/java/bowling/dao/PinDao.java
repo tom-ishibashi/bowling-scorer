@@ -16,7 +16,7 @@ public class PinDao extends BaseDao {
 
     @Override
     public void init() throws SQLException {
-        this.insert = getCon().prepareStatement("insert into pin (frame_id, frame_no, throwing, count, entry_date, upd_date, version) values (?,?,?,?,?,?,?)");
+        this.insert = getCon().prepareStatement("insert into pin (frame_id, frame_no, throwing, count, entry_date, upd_date, version, fail_code) values (?,?,?,?,?,?,?,?)");
     }
 
     public PinDao(Connection con) throws SQLException {
@@ -41,6 +41,7 @@ public class PinDao extends BaseDao {
         ps.setTimestamp(5, pin.getEntryDate());
         ps.setTimestamp(6, pin.getUpdDate());
         ps.setInt(7, pin.getVersion());
+        ps.setInt(8, pin.getFailCode());
         executeUpdate(ps);
     }
 
@@ -60,6 +61,7 @@ public class PinDao extends BaseDao {
 
         bowling.model.Pin pin = frame.getPins().get(throwing - 1);
         entity.setCount(pin.getCount());
+        entity.setFailCode(pin.getFailCode());
         return entity;
     }
 

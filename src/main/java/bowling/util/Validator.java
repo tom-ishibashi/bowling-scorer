@@ -1,5 +1,10 @@
 package bowling.util;
 
+import bowling.Entity.Fail;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * バリデータークラス
  *
@@ -16,7 +21,6 @@ public class Validator {
         try {
             Integer.parseInt(value);
         } catch (NumberFormatException nfe) {
-            System.out.println("0~10の数値を入力してください。");
             return false;
         }
         return true;
@@ -32,7 +36,6 @@ public class Validator {
        if (0 <= value && value <= 10) {
             return true;
        }
-       System.out.println("0~10の数値を入力してください。");
        return false;
    }
 
@@ -45,9 +48,54 @@ public class Validator {
      */
    public static boolean isValidSumValues(int value1, int value2) {
         if (value1 + value2 > 10) {
-            System.out.println("2投の合計は10以内になるように入力してください。");
             return false;
         }
        return true;
    }
+
+    /**
+     * パラメータが有効な文字列かチェック
+     *
+     * @param value
+     * @return
+     */
+   public static boolean isValidStringFirstThrow(String value) {
+       if (!Fail.GUTTER.getMark().equals(value) &&
+               !Fail.FOUL.getMark().equals(value)) {
+           return false;
+       }
+       return true;
+   }
+
+    /**
+     * パラメータが有効な文字列かチェック
+     *
+     * @param value
+     * @return
+     */
+    public static boolean isValidStringSecondThrow(String value) {
+        if (!Fail.GUTTER_HYPHEN.getMark().equals(value) &&
+                !Fail.FOUL.getMark().equals(value)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 使用可能文字種のチェック
+     *
+     * <p>
+     *     1文字でも使用不可能な文字が含まれている場合falseを返す。
+     * </p>
+     *
+     *
+     * @param value
+     * @return
+     */
+    public static boolean isValidCharType(String value) {
+
+        Pattern p = Pattern.compile("(\\d*|[A-Z]*|-)");
+        Matcher m = p.matcher(value);
+        return m.matches();
+    }
 }

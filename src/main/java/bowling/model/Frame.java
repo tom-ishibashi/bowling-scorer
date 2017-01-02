@@ -128,4 +128,31 @@ public class Frame {
     public int getThrownCount() {
         return getPins().size();
     }
+
+    public int getFailCodeFirst() {
+
+        // 1投目がまだの場合0を返します。
+        if (getPins().size() == 0) {
+            return 0;
+        }
+        return getPins().get(0).getFailCode();
+    }
+
+    public int getFailCodeSecond() {
+
+        // 2投目がまだの場合0を返します。
+        if (getPins().size() == 1) {
+            return 0;
+        }
+        return getPins().get(1).getFailCode();
+    }
+
+    public int getFailCodeThird() {
+
+        // 2投目がまだの場合0を返します。
+        if (getPins().size() == 2) {
+            return 0;
+        }
+        return getPins().get(2).getFailCode();
+    }
 }

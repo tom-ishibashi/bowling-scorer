@@ -1,5 +1,6 @@
 package bowling.presentation;
 
+import bowling.Entity.Fail;
 import bowling.model.Frame;
 
 import java.util.List;
@@ -7,10 +8,6 @@ import java.util.List;
 public class OutputData {
 
     private static final String PIPE = "|";
-    private static final String STRIKE = "X";
-    private static final String SPARE = "/";
-    private static final String GUTTER = "G";
-    private static final String FAUL = "F";
     private static final String HALF_SPACE = " ";
 
     /**
@@ -61,17 +58,22 @@ public class OutputData {
         StringBuilder pinRow = new StringBuilder();
         frames.forEach(frame -> {
             pinRow.append(PIPE);
-
-            int firstThrow = frame.getFirstPinCount();
-            int secondThrow = frame.getSecondPinCount();
-            pinRow.append(firstThrow);
+            pinRow.append(getFirstDisplay(frame.getFailCodeFirst(), frame.getFirstPinCount()));
             pinRow.append(PIPE);
-            pinRow.append(secondThrow);
+
+            if (frame.getFrameNo() < 10) {
+                if (frame.isStrike()) {
+                    pinRow.append(HALF_SPACE);
+                } else {
+                    pinRow.append(getSecondAndThirdDisplay(frame.getFailCodeSecond(), frame.getSecondPinCount()));
+                }
+            } else {
+                pinRow.append(getSecondAndThirdDisplay(frame.getFailCodeSecond(), frame.getSecondPinCount()));
+            }
 
             if (frame.getFrameNo() == 10 && frame.getThrownCount() == 3) {
-                int thirdThrow = frame.getThirdPinCount();
                 pinRow.append(PIPE);
-                pinRow.append(thirdThrow);
+                pinRow.append(getSecondAndThirdDisplay(frame.getFailCodeThird(), frame.getThirdPinCount()));
 
             } else if (frame.getFrameNo() == 10 && frame.getThrownCount() < 3) {
                 pinRow.append(PIPE);
@@ -102,5 +104,41 @@ public class OutputData {
         });
         scoreRow.append(PIPE);
         return scoreRow.toString();
+    }
+
+    /**
+     * 1投目の表示内容を返します。
+     *
+     * @param failCode
+     * @param count
+     * @return
+     */
+    private String getFirstDisplay(int failCode, int count) {
+        if (failCode == 0) {
+            if (count == 0) {
+                return Fail.GUTTER.getMark();
+            } else if (failCode == 0 && count > 0) {
+                return String.valueOf(count);
+            }
+        }
+        return Fail.getFail(failCode).getMark();
+    }
+
+    /**
+     * 2および3投目の表示内容を返します。
+     *
+     * @param failCode
+     * @param count
+     * @return
+     */
+    private String getSecondAndThirdDisplay(int failCode, int count) {
+        if (failCode == 0) {
+            if (count == 0) {
+                return Fail.GUTTER_HYPHEN.getMark();
+            } else if (failCode == 0 && count > 0) {
+                return String.valueOf(count);
+            }
+        }
+        return Fail.getFail(failCode).getMark();
     }
 }

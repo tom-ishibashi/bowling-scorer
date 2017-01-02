@@ -9,6 +9,7 @@ public class Pin extends BaseEntity {
     private Integer frameNo;
     private Integer throwing;
     private Integer count;
+    private Integer failCode;
 
     public Integer getFrameId() {
         return frameId;
@@ -40,5 +41,13 @@ public class Pin extends BaseEntity {
 
     public void setCount(Integer count) {
         this.count = count;
+    }
+
+    public Integer getFailCode() {
+        return failCode;
+    }
+
+    public void setFailCode(Integer failCode) {
+        this.failCode = failCode;
     }
 }

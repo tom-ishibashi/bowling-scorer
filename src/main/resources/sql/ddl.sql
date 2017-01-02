@@ -18,6 +18,8 @@ create table pin (
   count       integer(10),
   entry_date  datetime,
   upd_date    datetime,
-  version     integer,
+  version     integer(10),
   PRIMARY KEY(frame_id, frame_no, throwing)
 );
+
+alter table pin add fail_code integer(10) after count;
