@@ -27,6 +27,6 @@ public enum Success {
                 .stream()
                 .filter(e -> e.getMark().equals(mark))
                 .findFirst()
-                .get();
+                .orElseThrow(() -> new IllegalArgumentException("argument 'mark' is invalid."));
     }
 }

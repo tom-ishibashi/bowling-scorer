@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * フレームテーブルに対するデータベース操作を行います
@@ -14,6 +16,7 @@ public class FrameDao extends BaseDao {
 
     private PreparedStatement insert;
     private PreparedStatement update;
+    private PreparedStatement selectById;
 
     public FrameDao(Connection con) throws SQLException {
         super(con);
@@ -24,6 +27,7 @@ public class FrameDao extends BaseDao {
     public void init() throws SQLException {
         this.insert = getCon().prepareStatement("insert into frame (id, frame_no, score, entry_date, upd_date, version) values (?,?,?,?,?,?)");
         this.update = getCon().prepareStatement("update frame set score = ?, upd_date = ?, version = version + 1 where id = ? and frame_no = ?");
+        this.selectById = getCon().prepareStatement("select id, frame_no, score from frame where id = ? order by frame_no");
     }
 
 
@@ -80,6 +84,36 @@ public class FrameDao extends BaseDao {
     }
 
     /**
+     * idをもとにフレームを検索します
+     * 検索結果が無い場合は空のリストを返します
+     *
+     * @param id id
+     * @return エンティティのリスト
+     * @throws SQLException SQL例外
+     */
+    public List<Frame> selectById(int id) throws SQLException {
+        PreparedStatement ps = getSelectById();
+        ps.setInt(1, id);
+        ResultSet result = executeQuery(ps);
+
+        if (result == null) {
+            return new ArrayList<>();
+        }
+
+        List<Frame> entities = new ArrayList<>();
+        while (result.next()) {
+            Frame entity = new Frame();
+            entity.setId(result.getInt("id"));
+            entity.setFrameNo(result.getInt("frame_no"));
+            entity.setScore(result.getInt("score"));
+            entities.add(entity);
+        }
+
+        return entities;
+    }
+
+
+    /**
      * モデルからエンティティへ詰め替えを行います
      * TODO ユーティリティに切り出してもいいかも。
      *
@@ -94,11 +128,29 @@ public class FrameDao extends BaseDao {
         return entity;
     }
 
+    /**
+     * エンティティからモデルへ詰め替えを行います
+     *
+     * @param entity エンティティ
+     * @return モデル
+     */
+    public bowling.model.Frame convertToModel(Frame entity) {
+        bowling.model.Frame model = new bowling.model.Frame();
+        model.setId(entity.getId());
+        model.setFrameNo(entity.getFrameNo());
+        model.setScore(entity.getScore());
+        return model;
+    }
+
     private PreparedStatement getInsert() {
         return insert;
     }
 
     private PreparedStatement getUpdate() {
         return update;
+    }
+
+    private PreparedStatement getSelectById() {
+        return selectById;
     }
 }

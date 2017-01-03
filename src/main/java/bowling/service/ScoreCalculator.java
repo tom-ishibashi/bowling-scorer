@@ -8,8 +8,10 @@ import bowling.model.Pin;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * スコア計算のクラス
@@ -39,11 +41,10 @@ public class ScoreCalculator {
     /**
      * スコアを計算します
      *
-     * @param frames 前フレームまでのフレームリスト
+     * @param currentFrame 現在投球中のフレーム
+     * @return 最新のフレームリスト
      */
-    public void calculate(List<Frame> frames) throws SQLException {
-
-        Frame currentFrame = getFrame(frames, Cursor.LAST);
+    public List<Frame> calculate(Frame currentFrame) throws SQLException {
 
         // フレームID採番
         if (frameId == 0) {
@@ -51,17 +52,20 @@ public class ScoreCalculator {
         }
         currentFrame.setId(frameId);
 
-        // ストライクの計算
+        // 前フレームまでのリストを取得する
+        List<Frame> frames = getFrames(frameId);
+        frames.add(currentFrame);
+
+        // スコア計算
         calculateStrike(frames);
-
-        // スペアの計算
         calculateSpare(frames);
-
-        // ストライクとスペア以外の計算
         calculateNormal(frames);
 
         // 計算結果保存
         save(frames);
+
+        // 最新のフレームリストを返す
+        return getFrames(frameId);
     }
 
 
@@ -72,7 +76,7 @@ public class ScoreCalculator {
      *     ストライクでもスペアでもない場合にスコアを計算します。
      * </p>
      *
-     * @param frames フレーム
+     * @param frames フレームリスト
      */
     private void calculateNormal(List<Frame> frames) throws SQLException{
 
@@ -120,7 +124,7 @@ public class ScoreCalculator {
      */
     private void calculateStrike(List<Frame> frames) throws SQLException {
 
-        int updatedFrameNo = 0;
+        int updatedFrameNo;
 
         // 投球に合わせてストライクを計算
         switch (Throwing.getThrowing(getFrame(frames, Cursor.LAST).getThrownCount())) {
@@ -477,8 +481,40 @@ public class ScoreCalculator {
             return Arrays.stream(Throwing.values())
                     .filter(t -> t.getCount() == count)
                     .findFirst()
-                    .get();
+                    .orElseThrow(() -> new IllegalArgumentException("argument 'count' is invalid. expect(1-3), but actual " + count ));
         }
     }
 
+    /**
+     * idをもとに全フレームのリストを取得します
+     *
+     * @param id ID
+     * @return フレームリスト
+     * @throws SQLException SQL例外
+     */
+    private List<Frame> getFrames(int id) throws SQLException {
+
+        List<bowling.Entity.Frame> frameEntities = getFrameDao().selectById(id);
+        List<bowling.Entity.Pin> pinEntities = getPinDao().selectById(id);
+
+        List<Frame> frames = new ArrayList<>();
+
+        // フレームNoと一致するピンのエンティティを抽出し、モデルに詰め替え
+        frameEntities.forEach(f -> {
+            Frame frame = getFrameDao().convertToModel(f);
+
+            List<bowling.Entity.Pin> tmpPinEntities = pinEntities
+                    .stream()
+                    .filter(pin -> pin.getFrameNo().equals(f.getFrameNo()))
+                    .map(p -> p)
+                    .collect(Collectors.toList());
+
+            List<Pin> pins = new ArrayList<>();
+            tmpPinEntities.forEach(p -> pins.add(getPinDao().convertToModel(p)));
+            frame.setPins(pins);
+
+            frames.add(frame);
+        });
+        return frames;
+    }
 }

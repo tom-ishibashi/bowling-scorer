@@ -5,7 +5,10 @@ import bowling.model.Frame;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * ピンテーブルに対するデータベース操作を行います
@@ -13,10 +16,12 @@ import java.sql.SQLException;
 public class PinDao extends BaseDao {
 
     private PreparedStatement insert;
+    private PreparedStatement selectById;
 
     @Override
     public void init() throws SQLException {
         this.insert = getCon().prepareStatement("insert into pin (frame_id, frame_no, throwing, count, entry_date, upd_date, version, fail_code) values (?,?,?,?,?,?,?,?)");
+        this.selectById = getCon().prepareStatement("select frame_id, frame_no, throwing, count, fail_code from pin where frame_id = ? order by frame_no, throwing");
     }
 
     public PinDao(Connection con) throws SQLException {
@@ -46,6 +51,38 @@ public class PinDao extends BaseDao {
     }
 
     /**
+     * idをもとにピンを検索します。
+     * 検索結果が無い場合は空のリストを返します
+     *
+     * @param id id
+     * @return エンティティのリスト
+     * @throws SQLException
+     */
+    public List<Pin> selectById(int id) throws SQLException {
+        PreparedStatement ps = getSelectById();
+        ps.setInt(1, id);
+        ResultSet result = executeQuery(ps);
+
+        if (result == null) {
+            return new ArrayList<>();
+        }
+
+        List<Pin> entities = new ArrayList<>();
+        while (result.next()) {
+            Pin entity = new Pin();
+            entity.setFrameId(result.getInt("frame_id"));
+            entity.setFrameNo(result.getInt("frame_no"));
+            entity.setThrowing(result.getInt("throwing"));
+            entity.setCount(result.getInt("count"));
+            entity.setFailCode(result.getInt("fail_code"));
+            entities.add(entity);
+        }
+
+        return entities;
+    }
+
+
+    /**
      * モデルからエンティティへ詰め替えを行います
      * TODO ユーティリティに切り出してもいいかも。
      *
@@ -65,7 +102,18 @@ public class PinDao extends BaseDao {
         return entity;
     }
 
+    public bowling.model.Pin convertToModel(Pin pin) {
+        bowling.model.Pin model = new bowling.model.Pin();
+        model.setCount(pin.getCount());
+        model.setFailCode(pin.getFailCode());
+        return model;
+    }
+
     private PreparedStatement getInsert() {
         return insert;
+    }
+
+    private PreparedStatement getSelectById() {
+        return selectById;
     }
 }

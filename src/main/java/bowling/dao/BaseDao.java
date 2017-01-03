@@ -20,8 +20,11 @@ abstract public class BaseDao {
         this.con = con;
     }
 
+    /**
+     * 初期処理を行う
+     * @throws SQLException SQL例外
+     */
     abstract public void init() throws SQLException;
-//    abstract public void closeConnection() throws SQLException; // todo いらんかも？
 
     /**
      * データベースのコネクションを取得する
@@ -34,7 +37,6 @@ abstract public class BaseDao {
             return DriverManager.getConnection(URL, USER, PASSWORD);
         } catch (SQLException e) {
             System.out.println("データベースに接続できませんでした");
-            e.printStackTrace();
             throw e;
         }
     }
@@ -65,16 +67,14 @@ abstract public class BaseDao {
      * selectを実行します
      */
     protected ResultSet executeQuery(String sql) throws SQLException {
-        ResultSet rs;
+
         try {
             Statement statement = getCon().createStatement();
-            rs = statement.executeQuery(sql);
+            return statement.executeQuery(sql);
 
         } catch (SQLException e) {
-            e.printStackTrace();
             throw e;
         }
-        return rs;
     }
 
     /**
@@ -87,7 +87,22 @@ abstract public class BaseDao {
             ps.executeUpdate();
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    /**
+     * selectを実行します
+     *
+     * @param ps
+     * @return
+     * @throws SQLException
+     */
+    protected ResultSet executeQuery(PreparedStatement ps) throws SQLException {
+
+        try {
+            return ps.executeQuery();
+        } catch (SQLException e) {
             throw e;
         }
     }

@@ -33,7 +33,7 @@ public enum Fail {
                 .stream()
                 .filter(e -> e.getMark().equals(mark))
                 .findFirst()
-                .get();
+                .orElseThrow(() -> new IllegalArgumentException("argument 'mark' is invalid."));
     }
 
     public static Fail getFail(int code) {
@@ -41,6 +41,6 @@ public enum Fail {
                 .stream()
                 .filter(e -> e.getCode() == code)
                 .findFirst()
-                .get();
+                .orElseThrow(() -> new IllegalArgumentException("argument 'code' is invalid."));
     }
 }

@@ -130,7 +130,7 @@ public class Frame {
      * @return スペアならtrue
      */
     public boolean isSpareSecondAndThird() {
-        return isStrike() && !isSpare() && getSecondPinCount() + getThirdPinCount() == 10;
+        return isStrike() && !isSpare() && getSecondPinCount() < 10 && getSecondPinCount() + getThirdPinCount() == 10;
     }
 
     /**

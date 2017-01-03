@@ -6,6 +6,9 @@ import bowling.model.Frame;
 
 import java.util.List;
 
+/**
+ * データ出力を行うクラス
+ */
 public class OutputData {
 
     private static final String PIPE = "|";
