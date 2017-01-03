@@ -112,12 +112,25 @@ public class Frame {
     }
 
     /**
-     * このフレームがスペアならtrueを返す
+     * このフレームの1投目と2投目がスペアならtrueを返す
      *
      * @return スペアならtrue
      */
     public boolean isSpare() {
         return !isStrike() && getFirstPinCount() + getSecondPinCount() == 10;
+    }
+
+    /**
+     * このフレームの2投目と3投目がスペアならtrueを返す
+     *
+     * <p>
+     *     1投目と2投目でスペアの場合はfalseとなる。
+     * </p>
+     *
+     * @return スペアならtrue
+     */
+    public boolean isSpareSecondAndThird() {
+        return isStrike() && !isSpare() && getSecondPinCount() + getThirdPinCount() == 10;
     }
 
     /**
@@ -129,7 +142,7 @@ public class Frame {
         return getPins().size();
     }
 
-    public int getFailCodeFirst() {
+    public int getFirstFailCode() {
 
         // 1投目がまだの場合0を返します。
         if (getPins().size() == 0) {
@@ -138,7 +151,7 @@ public class Frame {
         return getPins().get(0).getFailCode();
     }
 
-    public int getFailCodeSecond() {
+    public int getSecondFailCode() {
 
         // 2投目がまだの場合0を返します。
         if (getPins().size() == 1) {
@@ -147,7 +160,7 @@ public class Frame {
         return getPins().get(1).getFailCode();
     }
 
-    public int getFailCodeThird() {
+    public int getThirdFailCode() {
 
         // 2投目がまだの場合0を返します。
         if (getPins().size() == 2) {

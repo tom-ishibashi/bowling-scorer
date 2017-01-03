@@ -1,6 +1,7 @@
 package bowling.presentation;
 
 import bowling.Entity.Fail;
+import bowling.Entity.Success;
 import bowling.model.Frame;
 
 import java.util.List;
@@ -58,27 +59,10 @@ public class OutputData {
         StringBuilder pinRow = new StringBuilder();
         frames.forEach(frame -> {
             pinRow.append(PIPE);
-            pinRow.append(getFirstDisplay(frame.getFailCodeFirst(), frame.getFirstPinCount()));
+            pinRow.append(showFirst(frame));
             pinRow.append(PIPE);
-
-            if (frame.getFrameNo() < 10) {
-                if (frame.isStrike()) {
-                    pinRow.append(HALF_SPACE);
-                } else {
-                    pinRow.append(getSecondAndThirdDisplay(frame.getFailCodeSecond(), frame.getSecondPinCount()));
-                }
-            } else {
-                pinRow.append(getSecondAndThirdDisplay(frame.getFailCodeSecond(), frame.getSecondPinCount()));
-            }
-
-            if (frame.getFrameNo() == 10 && frame.getThrownCount() == 3) {
-                pinRow.append(PIPE);
-                pinRow.append(getSecondAndThirdDisplay(frame.getFailCodeThird(), frame.getThirdPinCount()));
-
-            } else if (frame.getFrameNo() == 10 && frame.getThrownCount() < 3) {
-                pinRow.append(PIPE);
-                pinRow.append(HALF_SPACE);
-            }
+            pinRow.append(showSecond(frame));
+            pinRow.append(showThird(frame));
         });
         pinRow.append(PIPE);
         return pinRow.toString();
@@ -109,36 +93,100 @@ public class OutputData {
     /**
      * 1投目の表示内容を返します。
      *
-     * @param failCode
-     * @param count
-     * @return
+     * @param frame フレーム
+     * @return 表示内容
      */
-    private String getFirstDisplay(int failCode, int count) {
-        if (failCode == 0) {
-            if (count == 0) {
+    private String showFirst(Frame frame) {
+
+        if (frame.getFirstFailCode() == 0) {
+            if (frame.getFirstPinCount() == 10) {
+                return Success.STRIKE.getMark();
+
+            } else if (frame.getFirstPinCount() == 0) {
                 return Fail.GUTTER.getMark();
-            } else if (failCode == 0 && count > 0) {
-                return String.valueOf(count);
+
+            } else {
+                return String.valueOf(frame.getFirstPinCount());
             }
         }
-        return Fail.getFail(failCode).getMark();
+        return Fail.getFail(frame.getFirstFailCode()).getMark();
     }
 
     /**
-     * 2および3投目の表示内容を返します。
+     * 2投目の表示内容を返します。
      *
-     * @param failCode
-     * @param count
-     * @return
+     * @param frame フレーム
+     * @return 表示内容
      */
-    private String getSecondAndThirdDisplay(int failCode, int count) {
-        if (failCode == 0) {
-            if (count == 0) {
-                return Fail.GUTTER_HYPHEN.getMark();
-            } else if (failCode == 0 && count > 0) {
-                return String.valueOf(count);
+    private String showSecond(Frame frame) {
+
+        // 1~9フレームの場合
+        if (frame.getFrameNo() < 10) {
+            if (frame.isStrike()) {
+                return HALF_SPACE;
+            }
+
+        // 10フレームの場合
+        } else {
+            if (frame.isStrike() && frame.getSecondPinCount() == 10) {
+                return Success.STRIKE.getMark();
             }
         }
-        return Fail.getFail(failCode).getMark();
+
+        if (frame.isSpare()) {
+            return Success.SPARE.getMark();
+
+        } else {
+            if (frame.getSecondFailCode() == 0) {
+                if (frame.getSecondPinCount() == 0) {
+                    return Fail.GUTTER_HYPHEN.getMark();
+
+                } else {
+                    return String.valueOf(frame.getSecondPinCount());
+                }
+            }
+        }
+
+        return Fail.getFail(frame.getSecondFailCode()).getMark();
+    }
+
+    /**
+     * 3投目の表示内容を返します。
+     *
+     * @param frame フレーム
+     * @return 表示内容
+     */
+    private String showThird(Frame frame) {
+
+        if (frame.getFrameNo() == 10 && frame.getThrownCount() == 3) {
+            if (frame.isStrike() &&
+                    frame.getSecondPinCount() == 10 &&
+                    frame.getThirdPinCount() == 10) {
+                return PIPE + Success.STRIKE.getMark();
+
+            } else if (frame.isSpare() && frame.getThirdPinCount() == 10) {
+                return PIPE + Success.STRIKE.getMark();
+
+            } else if (frame.isSpareSecondAndThird()) {
+                return PIPE + Success.SPARE.getMark();
+
+            } else {
+                if (frame.getThirdFailCode() == 0) {
+                    if (frame.getThirdPinCount() == 0) {
+                        return PIPE + Fail.GUTTER_HYPHEN.getMark();
+
+                    } else {
+                        return PIPE + String.valueOf(frame.getThirdPinCount());
+                    }
+                }
+            }
+
+            return PIPE + Fail.getFail(frame.getThirdFailCode()).getMark();
+
+        } else if (frame.getFrameNo() == 10 && frame.getThrownCount() < 3) {
+            return PIPE + HALF_SPACE;
+        }
+
+        return "";
     }
 }

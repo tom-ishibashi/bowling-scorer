@@ -1,6 +1,7 @@
 package bowling.presentation;
 
 import bowling.Entity.Fail;
+import bowling.Entity.Success;
 import bowling.model.Frame;
 import bowling.model.Pin;
 import bowling.util.Validator;
@@ -46,12 +47,12 @@ public class InputData {
             pin = new Pin();
 
             if (!validateCharType(value)) {
-                message.stream().forEach(System.out::println);
+                message.forEach(System.out::println);
                 continue;
             }
 
-            if (isChar(value)) {
-                if (validateInputString(value, frame.getPins())) {
+            if (isCharFail(value)) {
+                if (validateCharTypeFail(value, frame)) {
                     int failCode = 0;
                     switch (Fail.getFail(value)) {
                         case GUTTER:
@@ -71,6 +72,28 @@ public class InputData {
                         frame.getPins().add(pin);
                         break;
                     }
+                }
+            } else if (isCharSuccess(value)) {
+                if (validateCharTypeSuccess(value, frame)) {
+
+                    int count = 0;
+                    switch (Success.getSuccess(value)) {
+                        case STRIKE:
+                        case STRIKE_LOWER:
+                            count = 10;
+                            break;
+                        case SPARE:
+                            if (frame.getFrameNo() == 10 && frame.getThrownCount() == 2) {
+                                count = 10 - frame.getSecondPinCount();
+                            } else {
+                                count = 10 - frame.getFirstPinCount();
+                            }
+                            break;
+                    }
+
+                    pin.setCount(count);
+                    frame.getPins().add(pin);
+                    break;
                 }
             } else if (isNumber(value)) {
                 if (validateInputValue(value)) {
@@ -93,7 +116,7 @@ public class InputData {
             } else {
                 message.add("入力できない文字が含まれています。");
             }
-            message.stream().forEach(System.out::println);
+            message.forEach(System.out::println);
         }
     }
 
@@ -111,7 +134,7 @@ public class InputData {
         }
 
         if (!Validator.isAvailableRange(Integer.parseInt(val))) {
-            message.add("数値は0~10のいずれかを入力してください。");
+            message.add("数値は0~10の範囲で入力してください。");
             return false;
         }
         return true;
@@ -133,22 +156,55 @@ public class InputData {
         return true;
     }
 
+
     /**
      * 入力値のバリデーションを行います。
      *
      * @param val
      * @return
      */
-    private boolean validateInputString(String val, List<Pin> pins) {
+    private boolean validateCharTypeSuccess(String val, Frame frame) {
 
-        if (pins.size() == 0) {
-            if (!Validator.isValidStringFirstThrow(val)) {
-                message.add("0~10, G, Fのいずれかを入力してください。");
+        if (frame.getPins().size() == 0) {
+            if (!Validator.isValidStrikeCharType(val)) {
+                message.add("0~10, G, F, X, xのいずれかを入力してください。");
                 return false;
             }
         } else {
-            if (!Validator.isValidStringSecondThrow(val)) {
-                message.add("0~10, -, Fのいずれかを入力してください。");
+
+            if (frame.getFrameNo() < 10) {
+                if (!Validator.isValidSpareCharType(val)) {
+                    message.add("0~10, -, F, /のいずれかを入力してください。");
+                    return false;
+                }
+
+            } else {
+                if (!Validator.isValidStrikeCharType(val) && !Validator.isValidSpareCharType(val)) {
+                    message.add("0~10, X, x, /, -, Fのいずれかを入力してください。");
+                    return false;
+                }
+            }
+
+        }
+        return true;
+    }
+
+    /**
+     * 入力値のバリデーションを行います。
+     *
+     * @param val
+     * @return
+     */
+    private boolean validateCharTypeFail(String val, Frame frame) {
+
+        if (frame.getPins().size() == 0) {
+            if (!Validator.isValidFailedFirstThrowCharType(val)) {
+                message.add("0~10, G, F, X, xのいずれかを入力してください。");
+                return false;
+            }
+        } else {
+            if (!Validator.isValidFailedSecondThrowCharType(val)) {
+                message.add("0~10, -, F, /のいずれかを入力してください。");
                 return false;
             }
         }
@@ -187,8 +243,20 @@ public class InputData {
      * @param val
      * @return
      */
-    private boolean isChar(String val) {
+    private boolean isCharFail(String val) {
         Pattern p = Pattern.compile("[GF-]");
+        Matcher m = p.matcher(val);
+        return m.matches();
+    }
+
+    /**
+     * 文字のみと一致するか判定します
+     *
+     * @param val
+     * @return
+     */
+    private boolean isCharSuccess(String val) {
+        Pattern p = Pattern.compile("[xX/]");
         Matcher m = p.matcher(val);
         return m.matches();
     }
