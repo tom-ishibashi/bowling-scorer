@@ -112,36 +112,6 @@ public class FrameDao extends BaseDao {
         return entities;
     }
 
-
-    /**
-     * モデルからエンティティへ詰め替えを行います
-     * TODO ユーティリティに切り出してもいいかも。
-     *
-     * @param model モデル
-     * @return エンティティ
-     */
-    public Frame convertToEntity(bowling.model.Frame model) {
-        Frame entity = new Frame();
-        entity.setId(model.getId());
-        entity.setFrameNo(model.getFrameNo());
-        entity.setScore(model.getScore());
-        return entity;
-    }
-
-    /**
-     * エンティティからモデルへ詰め替えを行います
-     *
-     * @param entity エンティティ
-     * @return モデル
-     */
-    public bowling.model.Frame convertToModel(Frame entity) {
-        bowling.model.Frame model = new bowling.model.Frame();
-        model.setId(entity.getId());
-        model.setFrameNo(entity.getFrameNo());
-        model.setScore(entity.getScore());
-        return model;
-    }
-
     private PreparedStatement getInsert() {
         return insert;
     }

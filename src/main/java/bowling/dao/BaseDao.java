@@ -14,9 +14,9 @@ abstract public class BaseDao {
     private static final String PASSWORD = "devStudy1!";
     private static final String URL = "jdbc:mysql://localhost:3306/javaedu";
 
-    protected Connection con;
+    private Connection con;
 
-    public BaseDao(Connection con) throws SQLException {
+    protected BaseDao(Connection con) throws SQLException {
         this.con = con;
     }
 
@@ -29,8 +29,8 @@ abstract public class BaseDao {
     /**
      * データベースのコネクションを取得する
      *
-     * @return
-     * @throws SQLException
+     * @return コネクション
+     * @throws SQLException SQL例外
      */
     public static Connection getConnection() throws SQLException {
         try {
@@ -43,7 +43,7 @@ abstract public class BaseDao {
 
     /**
      * 保存時のパラメータをセットします
-     * @param entity
+     * @param entity エンティティ基底クラス
      */
     protected void setSaveParams(BaseEntity entity) {
         Calendar now = Calendar.getInstance();
@@ -55,7 +55,7 @@ abstract public class BaseDao {
 
     /**
      * 更新自のパラメータをセットします
-     * @param entity
+     * @param entity エンティティ基底クラス
      */
     protected void setUpdateParams(BaseEntity entity) {
 
@@ -65,6 +65,9 @@ abstract public class BaseDao {
 
     /**
      * selectを実行します
+     *
+     * @param sql sql
+     * @return 結果セット
      */
     protected ResultSet executeQuery(String sql) throws SQLException {
 
@@ -79,7 +82,8 @@ abstract public class BaseDao {
 
     /**
      * insert, update, deleteを実行します
-     * @param ps
+     *
+     * @param ps プリペアドステートメント
      */
     protected void executeUpdate(PreparedStatement ps) throws SQLException {
 
@@ -94,9 +98,9 @@ abstract public class BaseDao {
     /**
      * selectを実行します
      *
-     * @param ps
-     * @return
-     * @throws SQLException
+     * @param ps プリペアドステートメント
+     * @return 結果セット
+     * @throws SQLException SQL例外
      */
     protected ResultSet executeQuery(PreparedStatement ps) throws SQLException {
 

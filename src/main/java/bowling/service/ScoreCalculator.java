@@ -5,6 +5,7 @@ import bowling.dao.FrameDao;
 import bowling.dao.PinDao;
 import bowling.model.Frame;
 import bowling.model.Pin;
+import bowling.util.ModelAndEntityConverter;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -364,7 +365,7 @@ public class ScoreCalculator {
      */
     private void saveFrame(Frame frame) throws SQLException {
 
-        getFrameDao().save(getFrameDao().convertToEntity(frame));
+        getFrameDao().save(ModelAndEntityConverter.convertToEntity(frame));
     }
 
     /**
@@ -375,7 +376,7 @@ public class ScoreCalculator {
     private void savePin(Frame frame) throws SQLException {
 
         for (int i = 1; i <= frame.getPins().size(); i++) {
-            bowling.Entity.Pin pinEntity = getPinDao().convertToEntity(frame, i);
+            bowling.Entity.Pin pinEntity = ModelAndEntityConverter.convertToEntity(frame, i);
             getPinDao().save(pinEntity);
         }
     }
@@ -388,7 +389,7 @@ public class ScoreCalculator {
     private void update(Frame frame) throws SQLException {
 
         if (frame != null) {
-            getFrameDao().update(getFrameDao().convertToEntity(frame));
+            getFrameDao().update(ModelAndEntityConverter.convertToEntity(frame));
         }
     }
 
@@ -501,7 +502,7 @@ public class ScoreCalculator {
 
         // フレームNoと一致するピンのエンティティを抽出し、モデルに詰め替え
         frameEntities.forEach(f -> {
-            Frame frame = getFrameDao().convertToModel(f);
+            Frame frame = ModelAndEntityConverter.convertToModel(f);
 
             List<bowling.Entity.Pin> tmpPinEntities = pinEntities
                     .stream()
@@ -510,7 +511,7 @@ public class ScoreCalculator {
                     .collect(Collectors.toList());
 
             List<Pin> pins = new ArrayList<>();
-            tmpPinEntities.forEach(p -> pins.add(getPinDao().convertToModel(p)));
+            tmpPinEntities.forEach(p -> pins.add(ModelAndEntityConverter.convertToModel(p)));
             frame.setPins(pins);
 
             frames.add(frame);

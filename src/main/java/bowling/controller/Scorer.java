@@ -6,11 +6,10 @@ import bowling.presentation.OutputData;
 import bowling.service.ScoreCalculator;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * ボウリングのスコアラー
+ * ボウリングのスコアラークラス
  */
 public class Scorer {
 
